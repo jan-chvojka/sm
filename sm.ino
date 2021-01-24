@@ -1,11 +1,14 @@
 /*********
   Jan Chvojka
-  Complete project details at https://github.com/jan-chvojka/tsm
+  -------------------------------------------------------------
+  Sušený Maso Sensor/Controller
+
+  Complete project details at https://github.com/jan-chvojka/smsc
 *********/
-// Pokud chcete použít sériový výstup a sledovat
-// dění v programu pomocí serial monitoru, nastavte
-// false.
-#define DEBUG true
+
+// NEZAPOMENOUT PŘEJMENOVAT default.config.h NA sm.config.h
+// A NASTAVIT DLE POTŘEBY
+#include "sm.config.h"
 
 // Knihovny pro komunikaci po I2C
 #include <Wire.h>
@@ -19,9 +22,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-// OBSAHUJE HESLO PRO WIFI, přejmenujte default.secret.h na sm.secret.h
-#include "sm.config.h"
-
 // Vlastnostii displeje
 #define SCREEN_WIDTH 128 // šířka displeje v px
 #define SCREEN_HEIGHT 64 // výška displeje v px
@@ -32,9 +32,14 @@
 // Pokud chceme zasílat údaje po wifi.
 #define WIFI true
 #define WIFI_CONNECTION_INTERVAL 5 * 1000
+#define WIFI_RECONNECTION_INTERVAL 30 * 1000
 #define WIFI_SETUP_CONNECTION_ATTEMPTS 3
 
-#define MEASUREMENT_INTERVAL 10 * 1000
+#if DEBUG
+#define MEASUREMENT_INTERVAL 5 * 1000
+#else
+#define MEASUREMENT_INTERVAL 20 * 1000
+#endif
 
 // Deklarace SSD1306 displeje připojeného na I2C (SDA, SCL piny)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -43,6 +48,22 @@ Adafruit_BME280 bme;
 
 float measurements[2];
 int WifiConnectionAttempt = 0;
+
+unsigned long timeNow = 0;
+unsigned long timeLastWifiConnectionAttempt = 0;
+
+// typedef struct Buttons {
+//   const byte pin = D3;
+//   const int debounce = 100;
+//   const unsigned long shortPress = 100;
+//   const unsigned long doublePress = 600;
+//   const unsigned long  longPress = 1000;
+
+//   unsigned long counter = 0;
+//   int shortPressAmount = 0;
+//   bool previousState = NOT_PRESSED;
+//   bool currentState;
+// } Button;
 
 /**
  * Inicializace počítače.
@@ -59,6 +80,9 @@ void setup() {
  * Hlavní smyčka programu.
  */
 void loop() {
+  // aktuální čas od spuštění
+  timeNow = millis()/1000; 
+
   // naměříme hodnoty
   getMeasurements();
   // zobrazíme je na displeji
@@ -148,7 +172,18 @@ void setupDisplay() {
 }
 
 void setupWifi() {
-  #ifdef DEBUG
+  #if WIFI
+    return;
+  #endif
+
+  
+  
+  WiFi.disconnect();
+  delay(500);
+
+  timeLastWifiConnectionAttempt = millis()/1000; 
+
+  #if DEBUG
   Serial.println("[setupWifi] begin");
   Serial.println("[setupWifi] ssid: " + String(WIFI_SSID));
   Serial.println("[setupWifi] pass: " + String(WIFI_PASSWORD));
@@ -174,9 +209,15 @@ void setupWifi() {
     # endif
   }
   #ifdef DEBUG
+
   Serial.println();
+  WifiConnectionAttempt = 0;
   Serial.println("[setupWifi] end");
   # endif
+}
+
+void checkWifiConnection() {
+
 }
 
 void displayWelcomeMessage() {
@@ -218,6 +259,10 @@ void displayErrorMessage(String message) {
 }
 
 void displayWiFiStatus() {
+  #if WIFI
+    return;
+  #endif
+
   deleteLine(48,63);
   display.setTextSize(1);
   display.setCursor(0, 48);
