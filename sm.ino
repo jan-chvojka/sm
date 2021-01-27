@@ -49,7 +49,7 @@ unsigned long timeLastWifiConnectionAttempt = 0;
  */
 void setup() {
 
-  pinMode(0, INPUT);
+  // pinMode(0, INPUT);
 
   setupDebug();
   setupDisplay();
@@ -70,34 +70,35 @@ long loopCountMax = 100000;
 
 void loop() {
   // aktuální čas od spuštění
-  // timeNow = millis()/1000; 
+  timeNow = millis()/1000; 
   // loopButton();
   // naměříme hodnoty
-  // getMeasurements();
-  // // zobrazíme je na displeji
-  // displayMeasurements(String(measurements[0]), String(measurements[1]));
-  // //
-  // displayWiFiStatus();
-  // // uspíme počtač na definovanou dobu
-  // delay(MEASUREMENT_INTERVAL);
+  getMeasurements();
+  // zobrazíme je na displeji
+  displayMeasurements(String(measurements[0]), String(measurements[1]));
+  #ifdef displayWiFiStatus
+  displayWiFiStatus();
+  #endif
+  // uspíme počtač na definovanou dobu
+  delay(MEASUREMENT_INTERVAL);
 
-  #ifdef DEBUG
-  loopCount++;
+  // #ifdef DEBUG
+  // loopCount++;
   
-  if(loopCount > loopCountMax) {
-    int state = digitalRead(0);
-    delay(1000);
-    Serial.println(state);
-    // if(state == HIGH) {
-    //   Serial.println("[loop] test true");
-    // } 
-    // if (state == LOW) {
-    //   Serial.println("[loop] test false");
-    // }
+  // if(loopCount > loopCountMax) {
+  //   int state = digitalRead(0);
+  //   delay(1000);
+  //   Serial.println(state);
+  //   // if(state == HIGH) {
+  //   //   Serial.println("[loop] test true");
+  //   // } 
+  //   // if (state == LOW) {
+  //   //   Serial.println("[loop] test false");
+  //   // }
     
-    loopCount = 0;
-  }
-  # endif
+  //   loopCount = 0;
+  // }
+  // # endif
   
 }
 
@@ -108,20 +109,20 @@ void loop() {
  */
 void getMeasurements() {
   
-  #ifdef DEBUG
-  display.println("[getMeasurements] begin");
-  # endif
+  #if DEBUG
+  Serial.println("[getMeasurements] begin");
+  #endif
 
   measurements[0] = bme.readTemperature();
   measurements[1] = bme.readHumidity();
 
-  #ifdef DEBUG
-  display.println("[getMeasurements] C: " + String(measurements[0]));
-  display.println("[getMeasurements] H: " + String(measurements[1]));
+  #if DEBUG
+  Serial.println("[getMeasurements] C: " + String(measurements[0]));
+  Serial.println("[getMeasurements] H: " + String(measurements[1]));
   # endif
 
-  #ifdef DEBUG
-  display.println("[getMeasurements] end");
+  #if DEBUG
+  Serial.println("[getMeasurements] end");
   # endif
 }
 
@@ -144,18 +145,22 @@ void displayMeasurements(String temperature, String humidity) {
 }
 
 void setupDebug() {
-  #ifdef DEBUG
-  Serial.begin(115200);
+  #if DEBUG
+  Serial.begin(9600);
   // Počkáme na připojení serial monitoru.
   // while (!Serial) {
   //   ; // wait for serial port to connect. Needed for native USB port only
   // }
   delay(5000);
+  Serial.println();
   #endif
 }
 
 
 void setupSensor() {
+  #ifdef DEBUG
+    Serial.println("[setupSensor] begin");
+  #endif
   if (!bme.begin(BME280_ADRESA)) {
     displayErrorMessage("BME280: error");
     delay(5000);
@@ -164,23 +169,26 @@ void setupSensor() {
     #endif
     while (1);
   }  
+  #ifdef DEBUG
+    Serial.println("[setupSensor] end");
+  #endif
 }
 
 void setupDisplay() {
-  #ifdef DEBUG
+  #if DEBUG
   Serial.println("[setupDisplay] begin");
-  # endif
+  #endif
   
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
-    #ifdef DEBUG
+    #if DEBUG
     Serial.println(F("[setupDisplay] SSD1306 allocation failed"));
-    # endif
+    #endif
     for(;;);
   }  
 
-  #ifdef DEBUG
+  #if DEBUG
   Serial.println("[setupDisplay] end");
-  # endif
+  #endif
 }
 
 void checkWifiConnection() {
