@@ -21,29 +21,21 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-// Vlastnostii displeje
-#define SCREEN_WIDTH 128 // šířka displeje v px
-#define SCREEN_HEIGHT 64 // výška displeje v px
-
-// Nastavení adresy senzoru
-#define BME280_ADRESA (0x76)
-
-// Pokud chceme zasílat údaje po wifi.
-#define WIFI true
-#define WIFI_CONNECTION_INTERVAL 5 * 1000
-#define WIFI_RECONNECTION_INTERVAL 30 * 1000
-#define WIFI_SETUP_CONNECTION_ATTEMPTS 3
-
-#if DEBUG
-#define MEASUREMENT_INTERVAL 5 * 1000
-#else
-#define MEASUREMENT_INTERVAL 20 * 1000
+#if WIFI
+#include "wifi.defs.h"
+#include "wifi.func.h"
 #endif
+
+#include "button.defs.h"
 
 // Deklarace SSD1306 displeje připojeného na I2C (SDA, SCL piny)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 // Deklarace senzoru
 Adafruit_BME280 bme;
+// Deklarace tlačítka
+Button button;
+
+#include "button.func.h"
 
 float measurements[2];
 int WifiConnectionAttempt = 0;
@@ -51,45 +43,62 @@ int WifiConnectionAttempt = 0;
 unsigned long timeNow = 0;
 unsigned long timeLastWifiConnectionAttempt = 0;
 
-// typedef struct Buttons {
-//   const byte pin = D3;
-//   const int debounce = 100;
-//   const unsigned long shortPress = 100;
-//   const unsigned long doublePress = 600;
-//   const unsigned long  longPress = 1000;
-
-//   unsigned long counter = 0;
-//   int shortPressAmount = 0;
-//   bool previousState = NOT_PRESSED;
-//   bool currentState;
-// } Button;
 
 /**
  * Inicializace počítače.
  */
 void setup() {
+
+  pinMode(0, INPUT);
+
   setupDebug();
   setupDisplay();
   displayWelcomeMessage();
+  // setupButton();
   setupSensor();
+  #ifdef setupWifi
   setupWifi();
+  #endif
 }
 
 /**
  * Hlavní smyčka programu.
  */
+
+long loopCount = 0;
+long loopCountMax = 100000;
+
 void loop() {
   // aktuální čas od spuštění
-  timeNow = millis()/1000; 
-
+  // timeNow = millis()/1000; 
+  // loopButton();
   // naměříme hodnoty
-  getMeasurements();
-  // zobrazíme je na displeji
-  displayMeasurements(String(measurements[0]), String(measurements[1]));
-  //
-  displayWiFiStatus();
-  // uspíme počtač na definovanou dobu
-  delay(MEASUREMENT_INTERVAL);
+  // getMeasurements();
+  // // zobrazíme je na displeji
+  // displayMeasurements(String(measurements[0]), String(measurements[1]));
+  // //
+  // displayWiFiStatus();
+  // // uspíme počtač na definovanou dobu
+  // delay(MEASUREMENT_INTERVAL);
+
+  #ifdef DEBUG
+  loopCount++;
+  
+  if(loopCount > loopCountMax) {
+    int state = digitalRead(0);
+    delay(1000);
+    Serial.println(state);
+    // if(state == HIGH) {
+    //   Serial.println("[loop] test true");
+    // } 
+    // if (state == LOW) {
+    //   Serial.println("[loop] test false");
+    // }
+    
+    loopCount = 0;
+  }
+  # endif
+  
 }
 
 /**
@@ -136,11 +145,15 @@ void displayMeasurements(String temperature, String humidity) {
 
 void setupDebug() {
   #ifdef DEBUG
-  Serial.begin(9600);
+  Serial.begin(115200);
   // Počkáme na připojení serial monitoru.
-  delay(6000);
+  // while (!Serial) {
+  //   ; // wait for serial port to connect. Needed for native USB port only
+  // }
+  delay(5000);
   #endif
 }
+
 
 void setupSensor() {
   if (!bme.begin(BME280_ADRESA)) {
@@ -167,51 +180,6 @@ void setupDisplay() {
 
   #ifdef DEBUG
   Serial.println("[setupDisplay] end");
-  # endif
-}
-
-void setupWifi() {
-  #if WIFI
-    return;
-  #endif
-
-  
-  
-  WiFi.disconnect();
-  delay(500);
-
-  timeLastWifiConnectionAttempt = millis()/1000; 
-
-  #if DEBUG
-  Serial.println("[setupWifi] begin");
-  Serial.println("[setupWifi] ssid: " + String(WIFI_SSID));
-  Serial.println("[setupWifi] pass: " + String(WIFI_PASSWORD));
-  # endif
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    WifiConnectionAttempt++;
-    char message[128];
-    snprintf(message, sizeof(message), "WiFi: connecting [%i]", WifiConnectionAttempt);
-    displayErrorMessage(String(message));
-    delay(WIFI_CONNECTION_INTERVAL);
-    
-    if(WifiConnectionAttempt >= WIFI_SETUP_CONNECTION_ATTEMPTS
-      && WiFi.status() != WL_CONNECTED) {
-      #ifdef DEBUG
-      Serial.println("[setupWifi] could not connect to wifi.");
-      # endif
-      break;  
-    }
-    #ifdef DEBUG
-    Serial.print(".");
-    # endif
-  }
-  #ifdef DEBUG
-
-  Serial.println();
-  WifiConnectionAttempt = 0;
-  Serial.println("[setupWifi] end");
   # endif
 }
 
@@ -257,21 +225,4 @@ void displayErrorMessage(String message) {
   display.display(); 
 }
 
-void displayWiFiStatus() {
-  #if WIFI
-    return;
-  #endif
 
-  deleteLine(48,63);
-  display.setTextSize(1);
-  display.setCursor(0, 48);
-  if(WiFi.status() == WL_CONNECTED) 
-  {
-    display.println("WiFi: OK");
-  }
-  else 
-  {
-    display.println("WiFi: Error");
-  }
-  display.display(); 
-}
