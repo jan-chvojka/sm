@@ -13,8 +13,7 @@
 // Knihovny pro komunikaci po I2C
 #include <Wire.h>
 #include <SPI.h>
-// Knihovna pro wifi
-#include <ESP8266WiFi.h> 
+
 // Knihovna pro displej
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
