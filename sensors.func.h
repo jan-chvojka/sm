@@ -4,18 +4,18 @@ Adafruit_BME280 bme01;
 HTSensor htSensor;
 
 void setupSensor(void (*displayMessage)(String text)) {
-  #ifdef DEBUG
+  #ifdef SERIAL
     Serial.println("[setupSensor] begin");
   #endif
   if (!bme01.begin(BME280_ADRESA)) {
     displayMessage("BME280: error");
     delay(5000);
-    #ifdef DEBUG
+    #ifdef SERIAL
     Serial.println("[setupSensor] BME280 senzor nenalezen, zkontrolujte zapojeni!");
     #endif
     while (1);
   }  
-  #ifdef DEBUG
+  #ifdef SERIAL
     Serial.println("[setupSensor] end");
   #endif
 }
@@ -26,19 +26,19 @@ void setupSensor(void (*displayMessage)(String text)) {
  * Na indexu 1 je vlhkost.
  */
 void getMeasurements() {
-  #if DEBUG
+  #if SERIAL
   Serial.println("[getMeasurements] begin");
   #endif
 
   htSensor.temperature = bme01.readTemperature();
   htSensor.humidity = bme01.readHumidity();
 
-  #if DEBUG
+  #if SERIAL
   Serial.println("[getMeasurements] C: " + String(htSensor.temperature));
   Serial.println("[getMeasurements] H: " + String(htSensor.humidity));
   # endif
 
-  #if DEBUG
+  #if SERIAL
   Serial.println("[getMeasurements] end");
   # endif
 }

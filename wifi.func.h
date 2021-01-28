@@ -7,7 +7,7 @@ void setupWifi(void (*displayMessage)(String text)) {
 
   timeLastWifiConnectionAttempt = millis()/1000; 
 
-  #if DEBUG
+  #if SERIAL
   Serial.println("[setupWifi] begin");
   Serial.println("[setupWifi] ssid: " + String(WIFI_SSID));
   Serial.println("[setupWifi] pass: " + String(WIFI_PASSWORD));
@@ -23,16 +23,16 @@ void setupWifi(void (*displayMessage)(String text)) {
     
     if(WifiConnectionAttempt >= WIFI_SETUP_CONNECTION_ATTEMPTS
       && WiFi.status() != WL_CONNECTED) {
-      #ifdef DEBUG
+      #ifdef SERIAL
       Serial.println("[setupWifi] could not connect to wifi.");
       # endif
       break;  
     }
-    #ifdef DEBUG
+    #ifdef SERIAL
     Serial.print(".");
     # endif
   }
-  #ifdef DEBUG
+  #ifdef SERIAL
 
   Serial.println();
   WifiConnectionAttempt = 0;

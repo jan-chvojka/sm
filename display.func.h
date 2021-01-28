@@ -2,18 +2,18 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void setupDisplay() {
-  #if DEBUG
+  #if SERIAL
   Serial.println("[setupDisplay] begin");
   #endif
   
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
-    #if DEBUG
+    #if SERIAL
     Serial.println(F("[setupDisplay] SSD1306 allocation failed"));
     #endif
     for(;;);
   }  
 
-  #if DEBUG
+  #if SERIAL
   Serial.println("[setupDisplay] end");
   #endif
 }

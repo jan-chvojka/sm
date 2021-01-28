@@ -4,20 +4,20 @@ Button button;
 void (*handleShortPressCallback)();
 
 void handleShortPress() {
-  #ifdef DEBUG
+  #ifdef SERIAL
   Serial.println("short Press");
   # endif
   handleShortPressCallback();
 }
 
 void handleDoublePress() {
-  #ifdef DEBUG
+  #ifdef SERIAL
   Serial.println("Double Press");
   # endif
 }
 
 void handleLongPress() {
-  #ifdef DEBUG
+  #ifdef SERIAL
   Serial.println("Long Press");
   # endif
 }

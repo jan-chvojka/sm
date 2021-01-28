@@ -116,7 +116,7 @@ void loop() {
  * Základní nastavení
  */
 void setupDebug() {
-  #if DEBUG
+  #if SERIAL
   Serial.begin(9600);
   // Počkáme na připojení serial monitoru.
   // while (!Serial) {
