@@ -1,28 +1,22 @@
-
+// Deklarace tlačítka
+Button button;
 
 void handleShortPress() {
-   #ifdef DEBUG
+  #ifdef DEBUG
   Serial.println("short Press");
   # endif
-  // root["name"] = "shortPress";
-  // postToWia(root);
 }
 
 void handleDoublePress() {
   #ifdef DEBUG
   Serial.println("Double Press");
   # endif
-  // root["name"] = "doublePress";
-  // postToWia(root);
 }
 
 void handleLongPress() {
-  
   #ifdef DEBUG
   Serial.println("Long Press");
   # endif
-  // root["name"] = "longPress";
-  // postToWia(root);
 }
 
 void setupButton() {

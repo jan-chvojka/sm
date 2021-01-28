@@ -1,4 +1,7 @@
-void setupWifi() {
+int WifiConnectionAttempt = 0;
+unsigned long timeLastWifiConnectionAttempt = 0;
+
+void setupWifi(void (*displayMessage)(String text)) {
   WiFi.disconnect();
   delay(500);
 
@@ -15,7 +18,7 @@ void setupWifi() {
     WifiConnectionAttempt++;
     char message[128];
     snprintf(message, sizeof(message), "WiFi: connecting [%i]", WifiConnectionAttempt);
-    displayErrorMessage(String(message));
+    displayMessage(String(message));
     delay(WIFI_CONNECTION_INTERVAL);
     
     if(WifiConnectionAttempt >= WIFI_SETUP_CONNECTION_ATTEMPTS
@@ -37,21 +40,36 @@ void setupWifi() {
   # endif
 }
 
-void displayWiFiStatus() {
-  #if WIFI
+// void displayWiFiStatus() {
+//   #if WIFI
+//     return;
+//   #endif
+
+//   deleteLine(48,63);
+//   display.setTextSize(1);
+//   display.setCursor(0, 48);
+//   if(WiFi.status() == WL_CONNECTED) 
+//   {
+//     display.println("WiFi: OK");
+//   }
+//   else 
+//   {
+//     display.println("WiFi: Error");
+//   }
+//   display.display(); 
+// }
+
+void displayWiFiStatus(void (*displayMessage)(String text)) {
+  #if !WIFI
     return;
   #endif
-
-  deleteLine(48,63);
-  display.setTextSize(1);
-  display.setCursor(0, 48);
+  
   if(WiFi.status() == WL_CONNECTED) 
   {
-    display.println("WiFi: OK");
+    displayMessage("WiFi: OK");
   }
   else 
   {
-    display.println("WiFi: Error");
+    displayMessage("WiFi: Error");
   }
-  display.display(); 
 }
