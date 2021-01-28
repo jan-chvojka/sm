@@ -63,13 +63,19 @@ void displayWiFiStatus(void (*displayMessage)(String text)) {
   #if !WIFI
     return;
   #endif
-  
-  if(WiFi.status() == WL_CONNECTED) 
-  {
-    displayMessage("WiFi: OK");
-  }
-  else 
-  {
-    displayMessage("WiFi: Error");
+
+  static wl_status_t PrevStatus = WL_DISCONNECTED;
+  wl_status_t CurrentStatus = WiFi.status();
+
+  if(PrevStatus != CurrentStatus) {
+    PrevStatus = CurrentStatus;
+    if(CurrentStatus == WL_CONNECTED) 
+    {
+      displayMessage("WiFi: Connected");  
+    }
+    else 
+    {
+      displayMessage("WiFi: Error");
+    }  
   }
 }

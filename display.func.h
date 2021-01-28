@@ -48,6 +48,7 @@ void deleteLine(int y1, int y2) {
 }
 
 void displayStatusMessage(String message) {
+
   display.setTextSize(1);
   deleteLine(48,63);
   
