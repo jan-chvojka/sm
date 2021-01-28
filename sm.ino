@@ -35,24 +35,9 @@
 
 HTSensor htSensorCurrent;
 
-/**
- * Inicializace počítače.
- */
-void setup() {
-  setupDebug();
-  setupDisplay();
-  displayWelcomeMessage();
-  setupButton();
-  setupSensor(displayStatusMessage);
-  #if WIFI
-  Serial.println("[setup] setupWifi");
-  setupWifi(displayStatusMessage);
-  #endif
-}
-
 void mainFSMLoop(bool reset = false)
 {
-  const uint32_t DISPLAY_ON_TIME = 30 * 1000;
+  const uint32_t DISPLAY_ON_TIME = 60 * 1000;
   static enum { DISPLAY_ON, DISPLAY_OFF, DISPLAY_SLEEP, DISPLAY_WAIT } state = DISPLAY_ON;
   static uint32_t timeLastTransition = 0;
  
@@ -69,7 +54,7 @@ void mainFSMLoop(bool reset = false)
   switch (state)
   {
     case DISPLAY_OFF: 
-      //Serial.println("OFF");
+      Serial.println("OFF");
       display.ssd1306_command(SSD1306_DISPLAYOFF);
       state = DISPLAY_SLEEP;
       break;
@@ -79,6 +64,7 @@ void mainFSMLoop(bool reset = false)
       // po zapnutí displeje čeká než vyprší čas a pak se vypne
       Serial.println("ON");
       // display.ssd1306_command(SSD1306_DISPLAYON);
+      display.ssd1306_command(SSD1306_DISPLAYON);
       timeLastTransition = millis();
       state = DISPLAY_WAIT;
       break;
@@ -92,11 +78,17 @@ void mainFSMLoop(bool reset = false)
   }
 }
 
+void reset() {
+  sensorFSMLoop(true);
+  mainFSMLoop(true);
+}
+
 /**
  * Hlavní smyčka programu.
  */
 void loop() {
 
+  loopButton();
   // změříme hodnoty na senzoru  
   sensorFSMLoop(false);
 
@@ -136,6 +128,19 @@ void setupDebug() {
 }
 
 
-
+/**
+ * Inicializace počítače.
+ */
+void setup() {
+  setupDebug();
+  setupDisplay();
+  displayWelcomeMessage();
+  setupButton(reset);
+  setupSensor(displayStatusMessage);
+  #if WIFI
+  Serial.println("[setup] setupWifi");
+  setupWifi(displayStatusMessage);
+  #endif
+}
 
 

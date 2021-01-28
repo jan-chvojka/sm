@@ -1,10 +1,13 @@
 // Deklarace tlačítka
 Button button;
 
+void (*handleShortPressCallback)();
+
 void handleShortPress() {
   #ifdef DEBUG
   Serial.println("short Press");
   # endif
+  handleShortPressCallback();
 }
 
 void handleDoublePress() {
@@ -19,7 +22,8 @@ void handleLongPress() {
   # endif
 }
 
-void setupButton() {
+void setupButton(void (*handleShortPressFn)()) {
+  handleShortPressCallback = handleShortPressFn;
   pinMode(button.pin, INPUT_PULLUP);
 }
 
