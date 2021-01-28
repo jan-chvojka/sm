@@ -43,18 +43,17 @@ int WifiConnectionAttempt = 0;
 unsigned long timeNow = 0;
 unsigned long timeLastWifiConnectionAttempt = 0;
 
-
 /**
  * Inicializace počítače.
  */
 void setup() {
 
-  // pinMode(0, INPUT);
+  pinMode(D7 , INPUT);
 
   setupDebug();
   setupDisplay();
   displayWelcomeMessage();
-  // setupButton();
+  setupButton();
   setupSensor();
   #ifdef setupWifi
   setupWifi();
@@ -71,34 +70,18 @@ long loopCountMax = 100000;
 void loop() {
   // aktuální čas od spuštění
   timeNow = millis()/1000; 
-  // loopButton();
-  // naměříme hodnoty
-  getMeasurements();
-  // zobrazíme je na displeji
-  displayMeasurements(String(measurements[0]), String(measurements[1]));
-  #ifdef displayWiFiStatus
-  displayWiFiStatus();
-  #endif
-  // uspíme počtač na definovanou dobu
-  delay(MEASUREMENT_INTERVAL);
-
-  // #ifdef DEBUG
-  // loopCount++;
   
-  // if(loopCount > loopCountMax) {
-  //   int state = digitalRead(0);
-  //   delay(1000);
-  //   Serial.println(state);
-  //   // if(state == HIGH) {
-  //   //   Serial.println("[loop] test true");
-  //   // } 
-  //   // if (state == LOW) {
-  //   //   Serial.println("[loop] test false");
-  //   // }
-    
-  //   loopCount = 0;
-  // }
-  // # endif
+  loopButton();
+  // naměříme hodnoty
+  // getMeasurements();
+  // // zobrazíme je na displeji
+  // displayMeasurements(String(measurements[0]), String(measurements[1]));
+  // #ifdef displayWiFiStatus
+  // displayWiFiStatus();
+  // #endif
+
+  // delay(MEASUREMENT_INTERVAL);
+
   
 }
 

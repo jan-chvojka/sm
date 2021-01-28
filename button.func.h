@@ -26,7 +26,7 @@ void handleLongPress() {
 }
 
 void setupButton() {
-  pinMode(button.pin, INPUT);
+  pinMode(button.pin, INPUT_PULLUP);
 }
 
 void loopButton() {
