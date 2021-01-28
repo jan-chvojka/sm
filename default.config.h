@@ -44,3 +44,5 @@
 
 // Nastavení adresy senzoru
 #define BME280_ADRESA (0x76)
+
+#define DISPLAY_ON_DURATION 30 * 1000

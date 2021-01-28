@@ -37,7 +37,7 @@ HTSensor htSensorCurrent;
 
 void mainFSMLoop(bool reset = false)
 {
-  const uint32_t DISPLAY_ON_TIME = 60 * 1000;
+  const uint32_t DISPLAY_ON_TIME = DISPLAY_ON_DURATION;
   static enum { DISPLAY_ON, DISPLAY_OFF, DISPLAY_SLEEP, DISPLAY_WAIT } state = DISPLAY_ON;
   static uint32_t timeLastTransition = 0;
  
@@ -118,11 +118,11 @@ void loop() {
 void setupDebug() {
   #if SERIAL
   Serial.begin(9600);
-  // Počkáme na připojení serial monitoru.
-  // while (!Serial) {
-  //   ; // wait for serial port to connect. Needed for native USB port only
-  // }
-  delay(5000);
+  // Počkáme na připojení serial monitoru, abychom chytli 
+  // setup výpisy.
+  #if DEBUG
+  delay(7000);
+  #endif
   Serial.println();
   #endif
 }
