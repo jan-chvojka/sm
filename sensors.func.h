@@ -59,7 +59,7 @@ void sensorFSMLoop(bool reset = false)
   if (reset)
   { 
     state = READ_DATA;
-    digitalWrite(LED_BUILTIN, LOW);
+    // digitalWrite(LED_BUILTIN, LOW);
   }
  
   switch (state)

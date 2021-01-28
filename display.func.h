@@ -18,14 +18,13 @@ void setupDisplay() {
   #endif
 }
 
-
 void displayWelcomeMessage() {
   display.clearDisplay();
   display.setTextSize(2);
   display.setTextColor(WHITE);
   display.setCursor(0, 0);
   // Display static text
-  display.println("SM");
+  display.println("SMS/C");
   display.setTextSize(1);
   display.setCursor(0, 16);
   display.println("v 1.0");
@@ -48,12 +47,29 @@ void deleteLine(int y1, int y2) {
 }
 
 void displayStatusMessage(String message) {
-
   display.setTextSize(1);
-  deleteLine(48,63);
+  deleteLine(56,63);
   
-  display.setCursor(0, 48);
+  display.setCursor(0, 56);
   display.println(message);
 
+  display.display(); 
+}
+
+/**
+ * Zobrazí hodnoty na displeji.
+ */
+void displayLines(String line1, String line2) {
+  deleteLine(0,15);
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+  // Display static text
+  display.println(line1);
+
+  deleteLine(16,32);
+  display.setCursor(0, 16);
+  display.println(line2);
+  
   display.display(); 
 }

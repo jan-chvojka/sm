@@ -4,5 +4,5 @@
 
 typedef struct HTSensors {
   float temperature = 0;
-  float humidity = 50;
+  float humidity = 0;
 } HTSensor;

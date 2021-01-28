@@ -33,7 +33,7 @@
 #include "wifi.func.h"
 #endif
 
-unsigned long timeNow = 0;
+HTSensor htSensorCurrent;
 
 /**
  * Inicializace počítače.
@@ -50,50 +50,79 @@ void setup() {
   #endif
 }
 
+void mainFSMLoop(bool reset = false)
+{
+  const uint32_t DISPLAY_ON_TIME = 30 * 1000;
+  static enum { DISPLAY_ON, DISPLAY_OFF, DISPLAY_SLEEP, DISPLAY_WAIT } state = DISPLAY_ON;
+  static uint32_t timeLastTransition = 0;
+ 
+  // nastavení defaulního stavu, když potřebujeme
+  // například změřit data po stisku tlačítka, abychom
+  // tam neměli "starou" hodnotu. Nebo obecně resetovat
+  // průběh.
+  if (reset)
+  { 
+    state = DISPLAY_ON;
+    // digitalWrite(LED_BUILTIN, LOW);
+  }
+ 
+  switch (state)
+  {
+    case DISPLAY_OFF: 
+      //Serial.println("OFF");
+      display.ssd1306_command(SSD1306_DISPLAYOFF);
+      state = DISPLAY_SLEEP;
+      break;
+    case DISPLAY_SLEEP:   
+      break;      
+    case DISPLAY_ON:   
+      // po zapnutí displeje čeká než vyprší čas a pak se vypne
+      Serial.println("ON");
+      // display.ssd1306_command(SSD1306_DISPLAYON);
+      timeLastTransition = millis();
+      state = DISPLAY_WAIT;
+      break;
+    case DISPLAY_WAIT:
+      if (millis() - timeLastTransition >= DISPLAY_ON_TIME)
+        state = DISPLAY_OFF;
+      break;
+    default:
+      state = DISPLAY_ON;
+      break;
+  }
+}
+
 /**
  * Hlavní smyčka programu.
  */
-
-long loopCount = 0;
-long loopCountMax = 100000;
-
 void loop() {
-  // aktuální čas od spuštění
-  timeNow = millis()/1000; 
-  
+
+  // změříme hodnoty na senzoru  
   sensorFSMLoop(false);
-  //loopButton();
-  // naměříme hodnoty
-  // getMeasurements();
-  // // zobrazíme je na displeji
-  // displayMeasurements(String(measurements[0]), String(measurements[1]));
+
+  // pokud se liší, zobrazíme
+  if(htSensorCurrent.temperature != htSensor.temperature
+  || htSensorCurrent.humidity != htSensor.humidity) 
+  {
+    htSensorCurrent.temperature = htSensor.temperature;
+    htSensorCurrent.humidity = htSensor.humidity;
+
+    String t = "C: " + String(htSensorCurrent.temperature);
+    String h = "H: " + String(htSensorCurrent.humidity);
+
+    displayLines(t, h);
+  }
+
+  mainFSMLoop(false);
+  
   #if WIFI
   displayWiFiStatus(displayStatusMessage);
   #endif
-
-  // delay(MEASUREMENT_INTERVAL);
 }
-
-
 
 /**
- * Zobrazí hodnoty na displeji.
+ * Základní nastavení
  */
-void displayMeasurements(String temperature, String humidity) {
-  display.clearDisplay();
-  
-  display.setTextSize(2);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 0);
-  // Display static text
-  display.println("C: " + temperature);
-
-  display.setCursor(0, 16);
-  display.println("H: " + humidity);
-  
-  display.display(); 
-}
-
 void setupDebug() {
   #if DEBUG
   Serial.begin(9600);
@@ -106,11 +135,6 @@ void setupDebug() {
   #endif
 }
 
-
-
-void checkWifiConnection() {
-
-}
 
 
 
