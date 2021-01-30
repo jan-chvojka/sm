@@ -123,7 +123,7 @@ void loop() {
  */
 void setupDebug() {
   #if SERIAL
-  Serial.begin(9600);
+  Serial.begin(115200);
   // Počkáme na připojení serial monitoru, abychom chytli 
   // setup výpisy.
   #if DEBUG
