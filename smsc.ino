@@ -23,6 +23,7 @@
 #include "button.defs.h"
 #if WIFI
 #include "wifi.defs.h"
+#include "mqtt.defs.h"
 #endif
 
 // Funkce
@@ -31,6 +32,7 @@
 #include "sensors.func.h"
 #if WIFI
 #include "wifi.func.h"
+#include "mqtt.func.h"
 #endif
 
 HTSensor htSensorCurrent;
@@ -107,9 +109,13 @@ void loop() {
 
   mainFSMLoop(false);
   
+  // #if WIFI
+  // displayWiFiStatus(displayStatusMessage);
+  // #endif
+
   #if WIFI
-  displayWiFiStatus(displayStatusMessage);
-  #endif
+  wifiFSM(displayStatusMessage);
+  #endif  
 }
 
 /**
@@ -137,10 +143,10 @@ void setup() {
   displayWelcomeMessage();
   setupButton(reset);
   setupSensor(displayStatusMessage);
-  #if WIFI
-  Serial.println("[setup] setupWifi");
-  setupWifi(displayStatusMessage);
-  #endif
+  // #if WIFI
+  // Serial.println("[setup] setupWifi");
+  // setupWifi(displayStatusMessage);
+  // #endif
 }
 
 

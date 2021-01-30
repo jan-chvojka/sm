@@ -56,6 +56,18 @@ void displayStatusMessage(String message) {
   display.display(); 
 }
 
+void displayStatusMessage(char* message) {
+  char messageToDisplay[128];
+  strncpy(messageToDisplay, message, 128);
+  display.setTextSize(1);
+  deleteLine(56,63);
+  
+  display.setCursor(0, 56);
+  display.println(messageToDisplay);
+
+  display.display(); 
+}
+
 /**
  * Zobrazí hodnoty na displeji.
  */
