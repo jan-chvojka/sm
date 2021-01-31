@@ -34,7 +34,7 @@ bool wifiFSM(void (*displayMessage)(char* text)) {
   } state = CONNECT;
 
   const uint32_t CONNECTION_DELAY_TIME = 20 * 1000;
-  uint32_t  lastConnectAttempt = 0;
+  static uint32_t  lastConnectAttempt = 0;
   char message[32];
 
   static bool connected = false;
@@ -82,7 +82,6 @@ bool wifiFSM(void (*displayMessage)(char* text)) {
     case DISCONNECTED:
       connected = false;
       lastConnectAttempt = millis();
-      Serial.println("D");
       state = CONNECTION_DELAY;
       break;      
   }

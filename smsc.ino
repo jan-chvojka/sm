@@ -56,7 +56,7 @@ void mainFSMLoop(bool reset = false)
   switch (state)
   {
     case DISPLAY_OFF: 
-      Serial.println("OFF");
+      Serial.println("[mainFSMLoop] OFF");
       display.ssd1306_command(SSD1306_DISPLAYOFF);
       state = DISPLAY_SLEEP;
       break;
@@ -64,7 +64,7 @@ void mainFSMLoop(bool reset = false)
       break;      
     case DISPLAY_ON:   
       // po zapnutí displeje čeká než vyprší čas a pak se vypne
-      Serial.println("ON");
+      Serial.println("[mainFSMLoop] ON");
       // display.ssd1306_command(SSD1306_DISPLAYON);
       display.ssd1306_command(SSD1306_DISPLAYON);
       timeLastTransition = millis();
@@ -108,13 +108,10 @@ void loop() {
   }
 
   mainFSMLoop(false);
-  
-  // #if WIFI
-  // displayWiFiStatus(displayStatusMessage);
-  // #endif
 
   #if WIFI
-  wifiFSM(displayStatusMessage);
+  bool connected = wifiFSM(displayStatusMessage);
+  mqttFSM(displayStatusMessage, connected);
   #endif  
 }
 
@@ -143,10 +140,6 @@ void setup() {
   displayWelcomeMessage();
   setupButton(reset);
   setupSensor(displayStatusMessage);
-  // #if WIFI
-  // Serial.println("[setup] setupWifi");
-  // setupWifi(displayStatusMessage);
-  // #endif
 }
 
 
