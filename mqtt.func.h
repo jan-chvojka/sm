@@ -3,7 +3,14 @@ PubSubClient client(espClient);
 
 String clientId = "smsc01";
 char mqttServer[] = "192.168.1.10";
-char pubTopic[] = "sensors/test";     //payload[0] will control/set LED
+char pubTopic[] = "domov/smsc01/server/detsky_pokoj"; // idealni
+//char pubTopic[] = "sensors/smsc01/server/detsky_pokoj"; // idealni
+
+
+void publishValue(char *name, char *value) {
+  char message[128];
+  snprintf(message, sizeof(message), "mqtt: error [%d]", mqttState);  
+}
 
 void mqttFSM(void (*displayMessage)(char* text), bool connect = true) {
 
@@ -44,13 +51,6 @@ void mqttFSM(void (*displayMessage)(char* text), bool connect = true) {
     
     previousMqttState = mqttState;
   }
-
-  // if(previousMqttState != mqttState) {
-  //   snprintf(message, sizeof(message), "mqtt: [%d]", mqttState);
-  //   Serial.println(message);
-  //   displayMessage(message);
-  //   previousMqttState = mqttState;
-  // }
 
   switch(state) {
     case CONNECT:
